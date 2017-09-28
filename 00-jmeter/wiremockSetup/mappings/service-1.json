@@ -1,0 +1,16 @@
+{
+  "request" : {
+    "url" : "/Services/Test/1",
+    "method" : "ANY"
+  },
+  "response" : {
+	"status" : 200,
+	"body" : "myTestResponse",
+	"delayDistribution" : {
+	
+	"type" : "uniform",
+		"upper" : 1600,
+		"lower": 1400
+	}
+  }
+}
