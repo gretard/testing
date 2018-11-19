@@ -3,16 +3,18 @@
 You need to:
 
 1. Download and install Java JDK from [http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html "http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html")
-2. Download Wiremock from [http://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.8.0/wiremock-standalone-2.8.0.jar](http://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.8.0/wiremock-standalone-2.8.0.jar "http://repo1.maven.org/maven2/com/github/tomakehurst/wiremock-standalone/2.8.0/wiremock-standalone-2.8.0.jar")
-3. Download and extract JMeter from [http://www.mirrorservice.org/sites/ftp.apache.org//jmeter/binaries/apache-jmeter-3.3.zip](http://www.mirrorservice.org/sites/ftp.apache.org//jmeter/binaries/apache-jmeter-3.3.zip "http://www.mirrorservice.org/sites/ftp.apache.org//jmeter/binaries/apache-jmeter-3.3.zip") 
+2. Download Wiremock from http://wiremock.org/docs/running-standalone/
+3. Download and extract JMeter binary zip from https://jmeter.apache.org/download_jmeter.cgi
 4. Download JMeter plugins from [https://jmeter-plugins.org/downloads/file/JMeterPlugins-Standard-1.4.0.zip](https://jmeter-plugins.org/downloads/file/JMeterPlugins-Standard-1.4.0.zip "https://jmeter-plugins.org/downloads/file/JMeterPlugins-Standard-1.4.0.zip")
 ## Exercises ##
 ### Pre-requisites ##
-
-1. Start Wiremock using the following command ( or you can use *run.cmd* file):
-	> java -jar wiremock-standalone-2.8.0.jar --root-dir wiremockSetup --no-request-journal
-2. In the browser you can check if it is working [http://localhost:8080/Services/Test/1](http://localhost:8080/Services/Test/1 "http://localhost:8080/Services/Test/1")
-2. Start JMeter (bin/jmeter.bat)
+0. Extract JMeter, extract plugins zip
+1. Copy wiremock jar to 00-jmeter folder
+2. Open Command prompt and navigate to 00-jmeter folder
+3. Start Wiremock using the following command ( or you can use *run.cmd* file):
+	> java -jar wiremock-standalone-2.19.0.jar --root-dir wiremockSetup --no-request-journal
+4. In the browser you can check if it is working [http://localhost:8080/Services/Test/1](http://localhost:8080/Services/Test/1 "http://localhost:8080/Services/Test/1")
+5. Start JMeter (bin/jmeter.bat)
  
 ### 1. Creating a basic test plan ###
 In this task you will create a basic test plan simulating 1 user hitting your site for 120s. Steps:

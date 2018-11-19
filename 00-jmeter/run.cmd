@@ -1,1 +1,1 @@
-java -jar wiremock-standalone-2.8.0.jar --root-dir wiremockSetup --no-request-journal
+java -jar wiremock-standalone-2.19.0.jar --root-dir wiremockSetup --no-request-journal
