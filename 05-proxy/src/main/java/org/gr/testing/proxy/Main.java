@@ -6,12 +6,17 @@ import java.io.InputStream;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import com.google.gson.Gson;
 
 import io.javalin.Javalin;
+import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.filters.RequestFilter;
@@ -26,13 +31,17 @@ public class Main {
 
 	public static void main(String[] args) throws UnknownHostException, SocketException {
 
-		final String baseDir = args.length > 0 ? args[0] : ".";
-		final File keyFile = new File(baseDir, "demo.key");
-		final File certFile = new File(baseDir, "demo.cer");
+		final String certificatesDir = args.length > 0 ? args[0] : ".";
+		final File keyFile = new File(certificatesDir, "demo.key");
+		final File certFile = new File(certificatesDir, "demo.cer");
 		final String privateKeyPwd = "demo123";
 		final Gson gson = new Gson();
 		final int proxyServicePort = 8888;
 		final int restServicePort = 7000;
+		final List<String> blockedUrls = Arrays.asList();
+		final List<CaptureType> captureTypes = Arrays.asList(CaptureType.REQUEST_CONTENT, CaptureType.REQUEST_COOKIES,
+				CaptureType.REQUEST_HEADERS, CaptureType.RESPONSE_CONTENT, CaptureType.RESPONSE_COOKIES,
+				CaptureType.RESPONSE_HEADERS);
 
 		final BrowserMobProxy proxy = new BrowserMobProxyServer();
 
@@ -55,18 +64,23 @@ public class Main {
 					.rootCertificateSource(rootCertificateGenerator).trustAllServers(true).build();
 
 			proxy.setMitmManager(mitmManager);
-			proxy.setHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.REQUEST_COOKIES,
-					CaptureType.REQUEST_HEADERS, CaptureType.RESPONSE_CONTENT, CaptureType.RESPONSE_COOKIES,
-					CaptureType.RESPONSE_HEADERS);
 			proxy.addRequestFilter(new RequestFilter() {
 				public HttpResponse filterRequest(HttpRequest request, HttpMessageContents contents,
 						HttpMessageInfo messageInfo) {
-					String url = messageInfo.getOriginalUrl().toLowerCase();
+					final String url = messageInfo.getOriginalUrl().toLowerCase();
 					System.out.println("Serving request: " + url);
+					for (String blockedUrl : blockedUrls) {
+						if (url.contains(blockedUrl)) {
+							return new DefaultHttpResponse(request.getProtocolVersion(), HttpResponseStatus.FORBIDDEN);
+						}
+					}
 					return null;
 				}
 			});
-			proxy.newHar();
+			if (!captureTypes.isEmpty()) {
+				proxy.setHarCaptureTypes(new HashSet<>(captureTypes));
+				proxy.newHar();
+			}
 			proxy.start(proxyServicePort);
 			System.out.println("Proxy started at: " + proxyServicePort);
 
@@ -82,7 +96,8 @@ public class Main {
 				ctx.result(targetStream);
 			});
 			app.get("/har", ctx -> {
-				ctx.header("Content-Disposition", "attachment; filename=\"out.har\"");
+				String fileName = "out-" + System.currentTimeMillis() + ".har";
+				ctx.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 				ctx.result(gson.toJson(proxy.getHar()));
 			});
 			app.get("/view", ctx -> {
